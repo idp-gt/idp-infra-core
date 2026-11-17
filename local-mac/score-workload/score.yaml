@@ -1,0 +1,37 @@
+# ==============================================================================
+# Score Specification Contract (score.yaml)
+# Lo que escribe el desarrollador para describir su aplicación sin tocar Kubernetes
+# ==============================================================================
+apiVersion: score.dev/v1b1
+metadata:
+  name: order-service
+
+service:
+  ports:
+    http:
+      port: 8080
+      targetPort: 8080
+
+containers:
+  api:
+    image: my-registry/order-service:v1.0.0
+    variables:
+      PORT: "8080"
+      ENVIRONMENT: "local"
+      # Inyección dinámica de dependencias resueltas por Crossplane:
+      DB_HOST: ${resources.db.host}
+      DB_USER: ${resources.db.username}
+      DB_PASSWORD: ${resources.db.password}
+      DB_NAME: ${resources.db.name}
+      STORAGE_BUCKET: ${resources.storage.bucketName}
+
+# Declaración abstracta de recursos (Crossplane los aprovisionará según el ambiente)
+resources:
+  db:
+    type: postgres
+    params:
+      extensions:
+        - uuid-ossp
+  storage:
+    type: s3-bucket
+

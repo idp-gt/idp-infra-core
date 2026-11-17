@@ -89,6 +89,7 @@ kubectl apply -f local-mac/apps/crossplane.yaml || true
 kubectl apply -f local-mac/apps/kyverno.yaml || true
 kubectl apply -f local-mac/apps/argo-rollouts.yaml || true
 kubectl apply -f local-mac/apps/grafana-alloy.yaml || true
+kubectl apply -f local-mac/apps/backstage.yaml || true
 kubectl apply -f local-mac/apps/policies/idp-guardrails.yaml || true
 
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
@@ -102,6 +103,7 @@ echo -e " 📁 Apps Path:       ${YELLOW}local-mac/apps${NC}"
 echo -e "${CYAN}${BOLD}------------------------------------------------------------------------${NC}"
 echo -e "${CYAN}${BOLD}  IDP Core Platform Stack Managed via GitOps:${NC}"
 echo -e "  ✔ Ingress-Nginx    (Local Gateway / Ports 80 & 443)"
+echo -e "  ✔ Backstage Portal (Developer Portal & Software Templates UI)"
 echo -e "  ✔ External-Secrets (Secrets Management & Zero Secret in Git)"
 echo -e "  ✔ Crossplane       (Infrastructure Control Plane & Self-Service API)"
 echo -e "  ✔ Kyverno          (Policy as Code & Security Guardrails)"

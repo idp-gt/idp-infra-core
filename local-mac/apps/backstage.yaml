@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: backstage
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: backstage
+    repoURL: https://backstage.github.io/charts
+    targetRevision: 1.7.0
+    helm:
+      values: |
+        upstream:
+          backstage:
+            image:
+              registry: quay.io
+              repository: janus-idp/backstage-showcase
+              tag: latest
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1Gi
+              requests:
+                cpu: 200m
+                memory: 512Mi
+        ingress:
+          enabled: true
+          className: nginx
+          host: localhost
+          path: /portal
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: backstage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
