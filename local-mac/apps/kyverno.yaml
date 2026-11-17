@@ -33,6 +33,10 @@ spec:
             enabled: false
           clusterAdmissionReports:
             enabled: false
+        policyReportsCleanup:
+          enabled: false
+        webhooksCleanup:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
