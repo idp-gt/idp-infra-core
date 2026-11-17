@@ -29,6 +29,8 @@ data:
         - host: gitlab.com
 
     argocd:
+      username: 'admin'
+      password: 'placeholder-password'
       appLocatorMethods:
         - type: 'config'
           instances:
@@ -61,6 +63,8 @@ spec:
     metadata:
       labels:
         app: backstage
+      annotations:
+        redeploy-trigger: "1"
     spec:
       containers:
         - name: backstage
