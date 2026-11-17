@@ -21,6 +21,8 @@ data:
           - "http://backstage.local"
           - "http://localhost"
           - "http://localhost:7007"
+      csp:
+        upgrade-insecure-requests: false
       auth:
         keys:
           - secret: "local-idp-secret-key-for-service-tokens-2026"
@@ -67,7 +69,7 @@ spec:
       labels:
         app: backstage
       annotations:
-        redeploy-trigger: "3"
+        redeploy-trigger: "4"
         prometheus.io/scrape: "true"
         prometheus.io/port: "7007"
         prometheus.io/path: "/metrics"
