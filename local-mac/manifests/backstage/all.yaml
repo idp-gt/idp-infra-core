@@ -7,17 +7,19 @@ data:
   app-config.local.yaml: |
     app:
       title: "IDP Developer Portal"
-      baseUrl: "http://localhost:7007"
+      baseUrl: "http://localhost"
 
     auth:
       environment: development
 
     backend:
-      baseUrl: "http://localhost:7007"
+      baseUrl: "http://localhost"
       listen:
         port: 7007
       cors:
-        origin: "http://localhost:7007"
+        origin:
+          - "http://localhost"
+          - "http://localhost:7007"
       auth:
         keys:
           - secret: "local-idp-secret-key-for-service-tokens-2026"
@@ -64,7 +66,7 @@ spec:
       labels:
         app: backstage
       annotations:
-        redeploy-trigger: "1"
+        redeploy-trigger: "2"
     spec:
       containers:
         - name: backstage
@@ -84,9 +86,9 @@ spec:
             - name: BACKEND_SECRET
               value: "local-idp-secret-key-for-service-tokens-2026"
             - name: APP_CONFIG_app_baseUrl
-              value: "http://localhost:7007"
+              value: "http://localhost"
             - name: APP_CONFIG_backend_baseUrl
-              value: "http://localhost:7007"
+              value: "http://localhost"
             - name: APP_CONFIG_backend_listen_port
               value: "7007"
           resources:
@@ -126,13 +128,12 @@ kind: Ingress
 metadata:
   name: backstage-ingress
   namespace: backstage
-  annotations:
-    ingress.class: nginx
 spec:
+  ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /portal
+          - path: /
             pathType: Prefix
             backend:
               service:
