@@ -1,0 +1,30 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: idp-require-non-root
+  annotations:
+    policies.kyverno.io/title: Disallow Root User
+    policies.kyverno.io/category: IDP Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >-
+      Containers must run as non-root to maintain IDP platform security standards.
+spec:
+  validationFailureAction: Audit # Usar Audit para monitorear, o Enforce para bloquear
+  background: true
+  rules:
+    - name: check-run-as-non-root
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - default
+                - apps
+      validate:
+        message: "Ejecutar como root no está permitido en cargas del IDP. Define 'runAsNonRoot: true'."
+        pattern:
+          spec:
+            =(securityContext):
+              runAsNonRoot: true
+

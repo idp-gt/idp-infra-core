@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # Script: bootstrap-gitops.sh
-# Purpose: Bootstrap ArgoCD on local Kind cluster with App of Apps in local-mac/apps
+# Purpose: Bootstrap ArgoCD on local Kind cluster with IDP Core Stack in local-mac/apps
 # ==============================================================================
 set -euo pipefail
 
@@ -9,6 +9,7 @@ BOLD='\033[1m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
 RED='\033[0;31m'
 NC='\033[0m'
 
@@ -78,19 +79,32 @@ spec:
       - CreateNamespace=true
 EOF
 
-# Pre-apply local applications directly so Ingress Nginx starts immediately without waiting for git sync
-echo -e "${GREEN}[INFO] Deploying local apps (Ingress-Nginx & Demo)...${NC}"
+# Pre-apply local applications directly so initial sync is immediate
+echo -e "${GREEN}[INFO] Pre-applying IDP Core Platform applications...${NC}"
+kubectl create namespace alloy --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml || true
 kubectl apply -f local-mac/apps/ingress-nginx.yaml || true
-kubectl apply -f local-mac/apps/demo-hello.yaml || true
-kubectl apply -f local-mac/apps/manifests/demo-hello/all.yaml || true
+kubectl apply -f local-mac/apps/external-secrets.yaml || true
+kubectl apply -f local-mac/apps/crossplane.yaml || true
+kubectl apply -f local-mac/apps/kyverno.yaml || true
+kubectl apply -f local-mac/apps/argo-rollouts.yaml || true
+kubectl apply -f local-mac/apps/grafana-alloy.yaml || true
+kubectl apply -f local-mac/apps/policies/idp-guardrails.yaml || true
 
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
-echo -e "${GREEN}${BOLD}  ArgoCD Local GitOps Bootstrap Completed!${NC}"
+echo -e "${GREEN}${BOLD}  ArgoCD Local IDP Core Bootstrap Completed!${NC}"
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
 echo -e " 🚀 ArgoCD UI:       ${YELLOW}http://localhost:30080${NC}"
 echo -e " 👤 Username:        ${YELLOW}admin${NC}"
 echo -e " 🔑 Password:        ${YELLOW}${ADMIN_PASS}${NC}"
 echo -e " 📦 Monitored Repo:  ${YELLOW}${GITOPS_REPO}${NC}"
 echo -e " 📁 Apps Path:       ${YELLOW}local-mac/apps${NC}"
-echo -e " 🌐 Test Ingress:    ${YELLOW}http://localhost/hello${NC}"
+echo -e "${CYAN}${BOLD}------------------------------------------------------------------------${NC}"
+echo -e "${CYAN}${BOLD}  IDP Core Platform Stack Managed via GitOps:${NC}"
+echo -e "  ✔ Ingress-Nginx    (Local Gateway / Ports 80 & 443)"
+echo -e "  ✔ External-Secrets (Secrets Management & Zero Secret in Git)"
+echo -e "  ✔ Crossplane       (Infrastructure Control Plane & Self-Service API)"
+echo -e "  ✔ Kyverno          (Policy as Code & Security Guardrails)"
+echo -e "  ✔ Argo Rollouts    (Progressive Delivery: Canary & Blue/Green)"
+echo -e "  ✔ Grafana Alloy    (OpenTelemetry Collector for Grafana Cloud)"
 echo -e "${GREEN}${BOLD}========================================================================${NC}"

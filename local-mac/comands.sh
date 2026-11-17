@@ -6,14 +6,20 @@
 open -a Docker
 brew install kind
 
-# 2. Levantar todo el entorno local (Kind 4 nodos + ArgoCD + App of Apps)
+# 2. Levantar todo el entorno local (Kind 4 nodos + ArgoCD + IDP Core Stack)
 make up-local
 
-# 3. Verificar estado de los nodos
-kubectl get nodes --show-labels
+# 3. Sincronizar cambios en Git (para que ArgoCD tome los nuevos componentes)
+git add .
+git commit -m "feat: add kyverno, argo-rollouts, grafana-alloy and github actions"
+git push origin main
 
-# 4. Verificar aplicaciones de ArgoCD
+# 4. Verificar estado del clúster y componentes IDP
+kubectl get nodes --show-labels
 kubectl get applications -n argocd
+kubectl get clusterpolicies
+kubectl get pods -n argo-rollouts
+kubectl get pods -n alloy
 
 # ------------------------------------------------------------------------------
 # Accesos locales:
@@ -24,8 +30,12 @@ kubectl get applications -n argocd
 #   Password: Se imprime al final de 'make up-local' o recuperar con:
 #   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 #
-# Demo Ingress:
-#   URL: http://localhost/hello
+# Argo Rollouts Dashboard (Canary / Blue-Green UI):
+#   kubectl argo rollouts dashboard -n argo-rollouts (acceso en http://localhost:3100)
+#
+# Grafana Alloy (Prometheus Remote Write a Grafana Cloud):
+#   Edita tus credenciales en local-mac/apps/grafana-cloud-secret.yaml y aplica:
+#   kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml
 # ------------------------------------------------------------------------------
 
 # 5. Destruir clúster local cuando termines

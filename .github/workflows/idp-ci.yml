@@ -1,0 +1,68 @@
+name: IDP Infrastructure & GitOps CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ------------------------------------------------------------------------------------------------
+  # 1. Validar Infraestructura como Código (Terraform & Terragrunt)
+  # ------------------------------------------------------------------------------------------------
+  validate-iac:
+    name: Lint & Validate IaC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt_version: 0.58.0
+
+      - name: Check Terraform Formatting
+        run: terraform fmt -check -recursive .
+
+  # ------------------------------------------------------------------------------------------------
+  # 2. Validar Manifiestos de Kubernetes y ArgoCD Apps
+  # ------------------------------------------------------------------------------------------------
+  validate-gitops:
+    name: Validate GitOps Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate YAML Syntax
+        run: |
+          python3 -c "
+          import yaml, glob
+          files = glob.glob('local-mac/**/*.yaml', recursive=True) + glob.glob('local-mac/**/*.yml', recursive=True)
+          for f in files:
+              with open(f) as fp:
+                  list(yaml.safe_load_all(fp))
+          print(f'Successfully validated {len(files)} YAML files.')
+          "
+
+  # ------------------------------------------------------------------------------------------------
+  # 3. Demostración de Score Contract Validation (score-k8s)
+  # ------------------------------------------------------------------------------------------------
+  validate-score-contract:
+    name: Score Contract Translation (score-k8s)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install score-k8s CLI
+        run: |
+          curl -sSL "https://github.com/score-spec/score-k8s/releases/download/0.1.7/score-k8s_0.1.7_linux_amd64.tar.gz" | tar -xz -C /usr/local/bin score-k8s
+          score-k8s --version
+
