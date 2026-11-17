@@ -110,7 +110,47 @@ spec:
               }
 
               // -----------------------------------------------------------------------
-              // 3. Destino: Prometheus Remote Write hacia Grafana Cloud (Mimir)
+              // 3. Scrape de Métricas de ArgoCD (Controller, Server, Repo, AppSet)
+              // -----------------------------------------------------------------------
+              prometheus.scrape "argocd" {
+                targets = [
+                  {
+                    "__address__" = "argocd-metrics.argocd.svc.cluster.local:8082",
+                    "job"         = "argocd-application-controller",
+                    "namespace"   = "argocd",
+                    "cluster"     = "idp-local-core",
+                  },
+                  {
+                    "__address__" = "argocd-server-metrics.argocd.svc.cluster.local:8083",
+                    "job"         = "argocd-server",
+                    "namespace"   = "argocd",
+                    "cluster"     = "idp-local-core",
+                  },
+                  {
+                    "__address__" = "argocd-repo-server.argocd.svc.cluster.local:8084",
+                    "job"         = "argocd-repo-server",
+                    "namespace"   = "argocd",
+                    "cluster"     = "idp-local-core",
+                  },
+                  {
+                    "__address__" = "argocd-applicationset-controller.argocd.svc.cluster.local:8080",
+                    "job"         = "argocd-applicationset-controller",
+                    "namespace"   = "argocd",
+                    "cluster"     = "idp-local-core",
+                  },
+                  {
+                    "__address__" = "argocd-notifications-controller-metrics.argocd.svc.cluster.local:9001",
+                    "job"         = "argocd-notifications-controller",
+                    "namespace"   = "argocd",
+                    "cluster"     = "idp-local-core",
+                  },
+                ]
+                scrape_interval = "15s"
+                forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+              }
+
+              // -----------------------------------------------------------------------
+              // 4. Destino: Prometheus Remote Write hacia Grafana Cloud (Mimir)
               // -----------------------------------------------------------------------
               prometheus.remote_write "grafana_cloud" {
                 endpoint {
