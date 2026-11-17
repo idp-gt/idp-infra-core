@@ -9,6 +9,9 @@ data:
       title: "IDP Developer Portal"
       baseUrl: "http://localhost:7007"
 
+    auth:
+      environment: development
+
     backend:
       baseUrl: "http://localhost:7007"
       listen:
@@ -65,7 +68,7 @@ spec:
               containerPort: 7007
           env:
             - name: NODE_ENV
-              value: "production"
+              value: "development"
             - name: BACKEND_SECRET
               value: "local-idp-secret-key-for-service-tokens-2026"
             - name: APP_CONFIG_app_baseUrl
