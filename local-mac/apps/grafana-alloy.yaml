@@ -98,7 +98,19 @@ spec:
               }
 
               // -----------------------------------------------------------------------
-              // 2. Destino: Prometheus Remote Write hacia Grafana Cloud (Mimir)
+              // 2. Scrape interno del propio Grafana Alloy
+              // -----------------------------------------------------------------------
+              prometheus.exporter.self "alloy" {
+              }
+
+              prometheus.scrape "alloy" {
+                targets         = prometheus.exporter.self.alloy.targets
+                scrape_interval = "30s"
+                forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+              }
+
+              // -----------------------------------------------------------------------
+              // 3. Destino: Prometheus Remote Write hacia Grafana Cloud (Mimir)
               // -----------------------------------------------------------------------
               prometheus.remote_write "grafana_cloud" {
                 endpoint {

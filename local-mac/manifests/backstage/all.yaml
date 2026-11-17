@@ -67,6 +67,9 @@ spec:
         app: backstage
       annotations:
         redeploy-trigger: "2"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "7007"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: backstage
