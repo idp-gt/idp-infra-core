@@ -15,6 +15,9 @@ data:
         port: 7007
       cors:
         origin: "http://localhost:7007"
+      auth:
+        keys:
+          - secret: "local-idp-secret-key-for-service-tokens-2026"
 
     integrations:
       github:
@@ -27,6 +30,8 @@ data:
         '/jfrog-artifactory/api': 'https://example.com'
         '/dynatrace': 'https://example.com'
         '/nexus-repository-manager': 'https://example.com'
+        '/jira/api': 'https://example.com'
+        '/acr/api': 'https://example.com'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -61,6 +66,8 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+            - name: BACKEND_SECRET
+              value: "local-idp-secret-key-for-service-tokens-2026"
             - name: APP_CONFIG_app_baseUrl
               value: "http://localhost:7007"
             - name: APP_CONFIG_backend_baseUrl
