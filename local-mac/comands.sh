@@ -24,6 +24,10 @@ kubectl get pods -n alloy
 # ------------------------------------------------------------------------------
 # Accesos locales:
 # ------------------------------------------------------------------------------
+# Backstage Developer Portal:
+#   URL: http://localhost/portal (vía Ingress)
+#   O directo: kubectl port-forward svc/backstage -n backstage 7007:7007 (en http://localhost:7007)
+#
 # ArgoCD UI:
 #   URL: http://localhost:30080
 #   Usuario: admin

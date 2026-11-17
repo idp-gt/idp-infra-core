@@ -82,13 +82,16 @@ EOF
 # Pre-apply local applications directly so initial sync is immediate
 echo -e "${GREEN}[INFO] Pre-applying IDP Core Platform applications...${NC}"
 kubectl create namespace alloy --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml || true
+kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml 2>/dev/null || true
 kubectl apply -f local-mac/apps/ingress-nginx.yaml || true
 kubectl apply -f local-mac/apps/external-secrets.yaml || true
 kubectl apply -f local-mac/apps/crossplane.yaml || true
 kubectl apply -f local-mac/apps/kyverno.yaml || true
 kubectl apply -f local-mac/apps/argo-rollouts.yaml || true
 kubectl apply -f local-mac/apps/grafana-alloy.yaml || true
+kubectl apply -f local-mac/apps/backstage.yaml || true
+kubectl apply -f local-mac/apps/manifests/backstage/all.yaml || true
 kubectl apply -f local-mac/apps/policies/idp-guardrails.yaml || true
 
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
@@ -102,6 +105,7 @@ echo -e " 📁 Apps Path:       ${YELLOW}local-mac/apps${NC}"
 echo -e "${CYAN}${BOLD}------------------------------------------------------------------------${NC}"
 echo -e "${CYAN}${BOLD}  IDP Core Platform Stack Managed via GitOps:${NC}"
 echo -e "  ✔ Ingress-Nginx    (Local Gateway / Ports 80 & 443)"
+echo -e "  ✔ Backstage Portal (Developer Portal / http://localhost/portal)"
 echo -e "  ✔ External-Secrets (Secrets Management & Zero Secret in Git)"
 echo -e "  ✔ Crossplane       (Infrastructure Control Plane & Self-Service API)"
 echo -e "  ✔ Kyverno          (Policy as Code & Security Guardrails)"

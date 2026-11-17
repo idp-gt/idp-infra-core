@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  namespace: backstage
+  labels:
+    app: backstage
+    app.kubernetes.io/name: backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      containers:
+        - name: backstage
+          image: quay.io/janus-idp/backstage-showcase:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 7007
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: APP_CONFIG_app_baseUrl
+              value: "http://localhost:7007"
+            - name: APP_CONFIG_backend_baseUrl
+              value: "http://localhost:7007"
+            - name: APP_CONFIG_backend_listen_port
+              value: "7007"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backstage
+  namespace: backstage
+  labels:
+    app: backstage
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 7007
+      targetPort: 7007
+  selector:
+    app: backstage
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backstage-ingress
+  namespace: backstage
+  annotations:
+    ingress.class: nginx
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /portal
+            pathType: Prefix
+            backend:
+              service:
+                name: backstage
+                port:
+                  number: 7007
+
