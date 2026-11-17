@@ -28,6 +28,14 @@ data:
       gitlab:
         - host: gitlab.com
 
+    argocd:
+      appLocatorMethods:
+        - type: 'config'
+          instances:
+            - name: 'local-argocd'
+              url: 'http://argocd-server.argocd.svc.cluster.local'
+              token: 'placeholder-token'
+
     proxy:
       endpoints:
         '/jfrog-artifactory/api': 'https://example.com'
