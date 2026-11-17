@@ -67,10 +67,6 @@ spec:
               value: "http://localhost:7007"
             - name: APP_CONFIG_backend_listen_port
               value: "7007"
-            - name: APP_CONFIG_integrations_gitlab_0_host
-              value: "gitlab.com"
-            - name: APP_CONFIG_integrations_github_0_host
-              value: "github.com"
           resources:
             requests:
               cpu: 100m
