@@ -38,8 +38,8 @@ kubectl get pods -n alloy
 #   kubectl argo rollouts dashboard -n argo-rollouts (acceso en http://localhost:3100)
 #
 # Grafana Alloy (Prometheus Remote Write a Grafana Cloud):
-#   Edita tus credenciales en local-mac/apps/grafana-cloud-secret.yaml y aplica:
-#   kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml
+#   Edita tus credenciales en local-mac/secrets/grafana-cloud-secret.yaml y aplica:
+#   kubectl apply -f local-mac/secrets/grafana-cloud-secret.yaml
 # ------------------------------------------------------------------------------
 
 # 5. Destruir clúster local cuando termines

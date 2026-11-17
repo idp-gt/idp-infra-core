@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/idp-gt/idp-infra-core.git
     targetRevision: HEAD
-    path: local-mac/apps/manifests/backstage
+    path: local-mac/manifests/backstage
   destination:
     server: https://kubernetes.default.svc
     namespace: backstage

@@ -83,7 +83,7 @@ EOF
 echo -e "${GREEN}[INFO] Pre-applying IDP Core Platform applications...${NC}"
 kubectl create namespace alloy --dry-run=client -o yaml | kubectl apply -f -
 kubectl create namespace backstage --dry-run=client -o yaml | kubectl apply -f -
-kubectl apply -f local-mac/apps/grafana-cloud-secret.yaml 2>/dev/null || true
+kubectl apply -f local-mac/secrets/grafana-cloud-secret.yaml 2>/dev/null || true
 kubectl apply -f local-mac/apps/ingress-nginx.yaml || true
 kubectl apply -f local-mac/apps/external-secrets.yaml || true
 kubectl apply -f local-mac/apps/crossplane.yaml || true
@@ -91,8 +91,8 @@ kubectl apply -f local-mac/apps/kyverno.yaml || true
 kubectl apply -f local-mac/apps/argo-rollouts.yaml || true
 kubectl apply -f local-mac/apps/grafana-alloy.yaml || true
 kubectl apply -f local-mac/apps/backstage.yaml || true
-kubectl apply -f local-mac/apps/manifests/backstage/all.yaml || true
-kubectl apply -f local-mac/apps/policies/idp-guardrails.yaml || true
+kubectl apply -f local-mac/manifests/backstage/all.yaml || true
+kubectl apply -f local-mac/policies/idp-guardrails.yaml || true
 
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
 echo -e "${GREEN}${BOLD}  ArgoCD Local IDP Core Bootstrap Completed!${NC}"
