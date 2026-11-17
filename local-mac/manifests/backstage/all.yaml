@@ -7,17 +7,18 @@ data:
   app-config.local.yaml: |
     app:
       title: "IDP Developer Portal"
-      baseUrl: "http://localhost"
+      baseUrl: "http://backstage.local"
 
     auth:
       environment: development
 
     backend:
-      baseUrl: "http://localhost"
+      baseUrl: "http://backstage.local"
       listen:
         port: 7007
       cors:
         origin:
+          - "http://backstage.local"
           - "http://localhost"
           - "http://localhost:7007"
       auth:
@@ -66,7 +67,7 @@ spec:
       labels:
         app: backstage
       annotations:
-        redeploy-trigger: "2"
+        redeploy-trigger: "3"
         prometheus.io/scrape: "true"
         prometheus.io/port: "7007"
         prometheus.io/path: "/metrics"
@@ -89,9 +90,9 @@ spec:
             - name: BACKEND_SECRET
               value: "local-idp-secret-key-for-service-tokens-2026"
             - name: APP_CONFIG_app_baseUrl
-              value: "http://localhost"
+              value: "http://backstage.local"
             - name: APP_CONFIG_backend_baseUrl
-              value: "http://localhost"
+              value: "http://backstage.local"
             - name: APP_CONFIG_backend_listen_port
               value: "7007"
           resources:
@@ -134,7 +135,18 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: backstage.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backstage
+                port:
+                  number: 7007
+    - host: localhost
+      http:
         paths:
           - path: /
             pathType: Prefix

@@ -46,6 +46,7 @@ kubectl rollout status deployment/argocd-server -n argocd --timeout=180s
 
 echo -e "${BLUE}[INFO] Patching argocd-server service to NodePort for local access (Port 30080)...${NC}"
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort", "ports": [{"port": 80, "targetPort": 8080, "nodePort": 30080}]}}' || true
+kubectl patch cm argocd-cmd-params-cm -n argocd --type merge -p '{"data": {"server.insecure": "true"}}' || true
 
 # Wait for initial admin secret
 echo -e "${BLUE}[INFO] Retrieving initial admin password...${NC}"
@@ -92,12 +93,15 @@ kubectl apply -f local-mac/apps/argo-rollouts.yaml || true
 kubectl apply -f local-mac/apps/grafana-alloy.yaml || true
 kubectl apply -f local-mac/apps/backstage.yaml || true
 kubectl apply -f local-mac/manifests/backstage/all.yaml || true
+kubectl apply -f local-mac/apps/argocd-ingress.yaml || true
+kubectl apply -f local-mac/manifests/argocd/ingress.yaml || true
 kubectl apply -f local-mac/policies/idp-guardrails.yaml || true
 
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
 echo -e "${GREEN}${BOLD}  ArgoCD Local IDP Core Bootstrap Completed!${NC}"
 echo -e "${GREEN}${BOLD}========================================================================${NC}"
-echo -e " 🚀 ArgoCD UI:       ${YELLOW}http://localhost:30080${NC}"
+echo -e " 🚀 ArgoCD UI:       ${YELLOW}http://argocd.local${NC} (o http://localhost:30080)"
+echo -e " 🧭 Backstage UI:    ${YELLOW}http://backstage.local${NC} (o http://localhost)"
 echo -e " 👤 Username:        ${YELLOW}admin${NC}"
 echo -e " 🔑 Password:        ${YELLOW}${ADMIN_PASS}${NC}"
 echo -e " 📦 Monitored Repo:  ${YELLOW}${GITOPS_REPO}${NC}"

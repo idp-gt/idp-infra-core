@@ -22,14 +22,19 @@ kubectl get pods -n argo-rollouts
 kubectl get pods -n alloy
 
 # ------------------------------------------------------------------------------
+# Configuración de Dominios Locales (ejecutar una sola vez en Mac):
+# sudo sh -c 'echo "127.0.0.1 backstage.local argocd.local" >> /etc/hosts'
+# ------------------------------------------------------------------------------
 # Accesos locales:
 # ------------------------------------------------------------------------------
 # Backstage Developer Portal:
-#   URL: http://localhost/portal (vía Ingress)
-#   O directo: kubectl port-forward svc/backstage -n backstage 7007:7007 (en http://localhost:7007)
+#   URL: http://backstage.local (o http://localhost vía Ingress)
+#   O directo sin Ingress:
+#   kubectl port-forward svc/backstage -n backstage 7007:7007 (en http://localhost:7007)
 #
 # ArgoCD UI:
-#   URL: http://localhost:30080
+#   URL: http://argocd.local (vía Ingress en puerto 80)
+#   O directo vía NodePort: http://localhost:30080
 #   Usuario: admin
 #   Password: Se imprime al final de 'make up-local' o recuperar con:
 #   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
