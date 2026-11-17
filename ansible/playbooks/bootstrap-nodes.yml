@@ -1,0 +1,88 @@
+---
+- name: Bootstrap and Harden Kubernetes Nodes (Simulated On-Prem Bare-Metal)
+  hosts: k8s_cluster
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: 1. Ensure hostname matches inventory hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: 2. Disable Swap immediately
+      ansible.builtin.command: swapoff -a
+      when: ansible_swaptotal_mb > 0
+      changed_when: false
+
+    - name: 3. Disable Swap permanently in /etc/fstab
+      ansible.builtin.replace:
+        path: /etc/fstab
+        regexp: '^(\s*)([^#\n]+\s+swap\s+\w+\s+[^\n]+)'
+        replace: '# \2'
+
+    - name: 4. Ensure required Linux kernel modules are configured to load on boot
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/k8s.conf
+        content: |
+          overlay
+          br_netfilter
+        mode: '0644'
+
+    - name: 5. Load kernel modules into current running kernel
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: 6. Apply sysctl parameters required for Kubernetes networking
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/99-kubernetes-cri.conf
+      loop:
+        - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+        - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+        - { name: 'net.ipv4.ip_forward', value: '1' }
+
+    - name: 7. Update apt cache and install base dependencies
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - software-properties-common
+          - socat
+          - conntrack
+          - ipset
+          - iptables
+          - jq
+          - htop
+        state: present
+
+    - name: 8. Ensure containerd package is installed and active
+      ansible.builtin.apt:
+        name: containerd
+        state: present
+
+    - name: 9. Configure containerd with SystemdCgroup enabled
+      ansible.builtin.shell: |
+        mkdir -p /etc/containerd
+        containerd config default > /etc/containerd/config.toml
+        sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+      args:
+        creates: /etc/containerd/config.toml
+
+    - name: 10. Restart and enable containerd service
+      ansible.builtin.systemd:
+        name: containerd
+        state: restarted
+        enabled: true
+

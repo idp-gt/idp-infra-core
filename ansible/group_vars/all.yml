@@ -1,0 +1,21 @@
+---
+# Ansible Global Variables for IDP On-Premises Simulation Cluster
+
+ansible_python_interpreter: /usr/bin/python3
+ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+# System Hardening and Performance settings
+system_disable_swap: true
+system_timezone: "UTC"
+ntp_enabled: true
+
+# Upstream DNS resolvers
+upstream_dns_servers:
+  - 8.8.8.8
+  - 1.1.1.1
+
+# Container runtime defaults
+container_manager: containerd
+containerd_version: "1.7.18"
+containerd_insecure_registries: {}
+

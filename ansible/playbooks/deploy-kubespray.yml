@@ -1,0 +1,52 @@
+---
+- name: Deploy Kubernetes via Kubespray
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    kubespray_repo: "https://github.com/kubernetes-sigs/kubespray.git"
+    kubespray_version: "v2.25.0"
+    kubespray_dir: "{{ playbook_dir }}/../../.kubespray"
+    inventory_file: "{{ inventory_dir }}/hosts.ini"
+
+  tasks:
+    - name: 1. Verify that inventory file exists
+      ansible.builtin.stat:
+        path: "{{ inventory_file }}"
+      register: inv_stat
+      failed_when: not inv_stat.stat.exists
+
+    - name: 2. Clone Kubespray repository if not already present
+      ansible.builtin.git:
+        repo: "{{ kubespray_repo }}"
+        dest: "{{ kubespray_dir }}"
+        version: "{{ kubespray_version }}"
+        depth: 1
+
+    - name: 3. Information banner
+      ansible.builtin.debug:
+        msg:
+          - "=========================================================================="
+          - " Ready to launch Kubespray deployment!"
+          - " Inventory: {{ inventory_file }}"
+          - " Run standard Kubespray playbook with:"
+          - " ansible-playbook -i {{ inventory_file }} -b -v {{ kubespray_dir }}/cluster.yml"
+          - "=========================================================================="
+
+    - name: 4. Execute Kubespray cluster.yml
+      ansible.builtin.command: >
+        ansible-playbook
+        -i {{ inventory_file }}
+        -b
+        -e @{{ playbook_dir }}/../group_vars/all.yml
+        -e @{{ playbook_dir }}/../group_vars/k8s_cluster.yml
+        {{ kubespray_dir }}/cluster.yml
+      register: kubespray_run
+      changed_when: true
+      ignore_errors: true
+
+    - name: 5. Display run summary
+      ansible.builtin.debug:
+        var: kubespray_run.stdout_lines
+
