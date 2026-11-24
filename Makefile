@@ -37,6 +37,7 @@ up-local: ## Launch local environment (Kind 4-node cluster on Docker Desktop + A
 	@echo -e "${GREEN}==> Step 2: Checking Kind CLI...${RESET}"
 	@command -v kind >/dev/null 2>&1 || { echo -e "${RED}[ERROR] 'kind' is not installed. Install it with: brew install kind${RESET}"; exit 1; }
 	@echo -e "${GREEN}==> Step 3: Creating Kind multi-node cluster (idp-local-core)...${RESET}"
+	@rm -f ~/.kube/config.lock 2>/dev/null || true
 	@if kind get clusters 2>/dev/null | grep -q "^idp-local-core$$"; then \
 		echo -e "${YELLOW}Kind cluster 'idp-local-core' already exists. Skipping creation.${RESET}"; \
 	else \

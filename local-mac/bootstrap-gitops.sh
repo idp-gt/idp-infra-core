@@ -40,13 +40,13 @@ kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
 
 echo -e "${GREEN}[INFO] Applying ArgoCD manifests (${ARGOCD_VERSION})...${NC}"
 kubectl apply -n argocd -f "https://raw.githubusercontent.com/argoproj/argo-cd/${ARGOCD_VERSION}/manifests/install.yaml"
+kubectl patch cm argocd-cmd-params-cm -n argocd --type merge -p '{"data": {"server.insecure": "true"}}' || true
 
 echo -e "${BLUE}[INFO] Waiting for ArgoCD server deployment to be ready...${NC}"
 kubectl rollout status deployment/argocd-server -n argocd --timeout=180s
 
 echo -e "${BLUE}[INFO] Patching argocd-server service to NodePort for local access (Port 30080)...${NC}"
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort", "ports": [{"port": 80, "targetPort": 8080, "nodePort": 30080}]}}' || true
-kubectl patch cm argocd-cmd-params-cm -n argocd --type merge -p '{"data": {"server.insecure": "true"}}' || true
 
 # Wait for initial admin secret
 echo -e "${BLUE}[INFO] Retrieving initial admin password...${NC}"
@@ -55,7 +55,7 @@ ADMIN_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpat
 
 # Create Root Application (App of Apps pattern) targeting local-mac/apps
 echo -e "${GREEN}[INFO] Registering Root Application targeting ${GITOPS_REPO} (path: local-mac/apps)...${NC}"
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -f - || true
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
