@@ -23,7 +23,7 @@ kubectl get pods -n alloy
 
 # ------------------------------------------------------------------------------
 # Configuración de Dominios Locales (ejecutar una sola vez en Mac):
-# sudo sh -c 'echo "127.0.0.1 backstage.local argocd.local" >> /etc/hosts'
+# sudo sh -c 'echo "127.0.0.1 backstage.local argocd.local rollouts.local" >> /etc/hosts'
 # ------------------------------------------------------------------------------
 # Accesos locales:
 # ------------------------------------------------------------------------------
@@ -40,7 +40,8 @@ kubectl get pods -n alloy
 #   kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
 #
 # Argo Rollouts Dashboard (Canary / Blue-Green UI):
-#   kubectl argo rollouts dashboard -n argo-rollouts (acceso en http://localhost:3100)
+#   URL: http://rollouts.local (vía Ingress en puerto 80)
+#   O directo en CLI: kubectl argo rollouts dashboard -n argo-rollouts (en http://localhost:3100)
 #
 # Grafana Alloy (Prometheus Remote Write a Grafana Cloud):
 #   Edita tus credenciales en local-mac/secrets/grafana-cloud-secret.yaml y aplica:
